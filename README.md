@@ -1,13 +1,40 @@
 # BMP-Editing-Tool
 BMP Image Editing Tool for PF Project @ FAST NU Semester 1
 
-# BMP File Format
+## Table of Contents
+1. [Introduction](#introduction)  
+2. [BMP File Format](#bmp-file-format)  
+   - [What is a BMP File?](#what-is-a-bmp-file)  
+   - [Structure of a BMP File](#structure-of-a-bmp-file)  
+   - [Supported BMP Type](#supported-bmp-type)  
+3. [File Structure](#file-structure) 
+4. [Function Descriptions](#function-descriptions)
+5. [Setup and Usage](#setup-and-compilation)
+6. [Collaborators](#collaborators)
+  
+
+## Introduction
+
+The **BMP Image Editing Tool** is a C-based application developed as part of the **Programming Fundamentals** project for the first semester at **FAST NUCES**. The tool allows users to apply a variety of image processing functions to **24-bit BMP files**. These functions include **grayscale conversion**, **sepia tone application**, **brightness and contrast adjustments**, **image rotation**, and more. The tool is designed to be easy to use with a simple command-line interface, providing essential editing features for BMP images in a lightweight manner.
+
+This project serves as a practical application of core programming concepts such as **file handling**, **looping**, **image processing algorithms**, **pointers** and **array handling** using C. It is structured to help users better understand BMP file formats and image manipulation techniques.
+
+
+## BMP File Format
 
 The BMP file format is used to store bitmap digital images. Below are the details of the **Bitmap File Header** and **Bitmap Info Header**.
 
 ---
 
-## Bitmap File Header
+### What is a BMP File?
+
+A BMP (Bitmap) file is a raster graphics image file format used to store bitmap digital images, particularly on Windows systems. It contains data organized in a specific structure, including headers and pixel data, to represent an image.
+
+---
+
+### Structure of a BMP File
+
+#### Bitmap File Header
 
 | Offset (hex) | Offset (dec) | Size (bytes) | Purpose                                                                                                                                 |
 |--------------|--------------|--------------|-----------------------------------------------------------------------------------------------------------------------------------------|
@@ -19,7 +46,7 @@ The BMP file format is used to store bitmap digital images. Below are the detail
 
 ---
 
-## Bitmap Info Header
+#### Bitmap Info Header
 
 | Offset (hex) | Offset (dec) | Size (bytes) | Windows BITMAPINFOHEADER                                                                                                               |
 |--------------|--------------|--------------|-----------------------------------------------------------------------------------------------------------------------------------------|
@@ -37,10 +64,7 @@ The BMP file format is used to store bitmap digital images. Below are the detail
 
 ---
 
-For more details, visit the [BMP file format Wikipedia page](https://en.wikipedia.org/wiki/BMP_file_format).
-
-
-### Requirements for Standard 24-bit BMP Files
+### Supported BMP Type
 
 We will be dealing with **standard 24-bit BMP files only**, for which the following checks are required:
 
@@ -53,7 +77,10 @@ We will be dealing with **standard 24-bit BMP files only**, for which the follow
 | `biBitCount`      | `24`                    |
 | `biCompression`   | `0` (BI_RGB)            |
 
-### Explanation of Header Fields:
+---
+
+### Explanation of Header Fields
+
 1. **`bfType`:**  
    Ensures the file is a valid BMP. The ASCII characters `BM` (hex: `0x4D42`) signify this.
 
@@ -72,6 +99,177 @@ We will be dealing with **standard 24-bit BMP files only**, for which the follow
 6. **`biCompression`:**  
    Specifies the compression method. A value of `0` (`BI_RGB`) means the image is uncompressed.
 
-### Note:
+---
+
+### Note
+
 These checks ensure that the BMP file conforms to the standard 24-bit uncompressed format. Any deviation from these values will result in an "Unsupported file format" error.
 
+
+# File Structure
+
+The project is organized as follows:
+
+## Description
+
+- **`images/`**: Folder containing sample BMP images for testing.
+  - Includes BMP files such as `100x100_image.bmp`, `stadium.bmp`, etc.
+  
+- **`bmp.h`**: Header file for defining BMP structures and constants.
+
+- **`filters.c`**: Contains implementations of image processing functions (e.g., grayscale, invert, etc.).
+
+- **`filters.h`**: Header file for declaring image processing functions.
+
+- **`main.c`**: The main program file that drives the tool.
+
+- **`main.exe`**: Compiled executable for the BMP Editing Tool.
+
+- **`make-bmp.c`**: Utility program to generate BMP files for testing.
+
+- **`README.md`**: Documentation file explaining the project, usage, and file details.
+
+# Function Descriptions
+
+## Grayscale
+- **Description**: Converts an image to grayscale.
+- **How it works**:
+  - For each pixel, the red, green, and blue values are summed and averaged.
+  - The average value is assigned to the red, green, and blue channels of the pixel.
+
+---
+
+## Sepia
+- **Description**: Applies a sepia tone to the image.
+- **How it works**:
+  - For each pixel, calculates `sepiaRed`, `sepiaGreen`, and `sepiaBlue` values using a predefined formula.
+  - Assigns these values to the red, green, and blue channels of the pixel.
+- **Reference**: [How is a sepia tone created?](https://stackoverflow.com/questions/1061093/how-is-a-sepia-tone-created)
+
+---
+
+## Reflect
+- **Description**: Horizontally reflects the image.
+- **How it works**:
+  - Divides the image width into two halves.
+  - Swaps pixel values from one end to the other.
+
+---
+
+## Blur
+- **Description**: Blurs the image.
+- **How it works**:
+  - For each pixel, calculates the sum of the RGB values of all surrounding pixels.
+  - Assigns the mean of these values to the RGB channels of the pixel.
+
+---
+
+## Edges
+- **Description**: Detects edges in the image.
+- **How it works**:
+  - Uses 3x3 Sobel kernels `Gx` and `Gy` to detect changes in pixel values relative to the center pixel.
+  - Edge pixels are highlighted in white.
+  
+---
+
+## Adjust Brightness
+- **Description**: Adjusts the brightness of the image.
+- **How it works**:
+  - Takes a brightness value from the user.
+  - Adds this value to the red, green, and blue channels of each pixel.
+
+---
+
+## Adjust Contrast
+- **Description**: Adjusts the contrast of the image.
+- **How it works**:
+  - Takes a `contrast_factor` from the user.
+  - Adjusts each pixel value using the formula:  
+    `new_value = factor(value - 128) + 128`
+- **Reference**: [Contrast Adjustment Algorithm](https://www.dfstudios.co.uk/articles/programming/image-programming-algorithms/image-processing-algorithms-part-5-contrast-adjustment/)
+
+---
+
+## Invert Colors
+- **Description**: Inverts the colors of the image.
+- **How it works**:
+  - For each pixel, subtracts the RGB values from `255` to compute the inverted color.
+
+---
+
+## Pixelate
+- **Description**: Applies a pixelation effect to the image.
+- **How it works**:
+  - Divides the image into blocks of a user-specified size.
+  - Assigns the same average RGB value to all pixels in a block.
+
+---
+
+## Vignette
+- **Description**: Adds a vignette effect to the image.
+- **How it works**:
+  - Calculates the distance of each pixel from the center.
+  - Based on the ratio of `distance / max_distance`, adjusts the RGB values to darken the edges.
+
+---
+
+## Sharpen
+- **Description**: Sharpens the image.
+- **How it works**:
+  - Applies a 3x3 kernel to each pixel to enhance edges and details.
+- **Reference**: [Image Processing Kernels](https://en.wikipedia.org/wiki/Kernel_(image_processing))
+
+---
+
+## Gaussian Blur
+- **Description**: Applies a Gaussian blur to the image.
+- **How it works**:
+  - Uses a 5x5 Gaussian kernel to calculate new pixel values.
+- **Reference**: [Gaussian Kernel](https://en.wikipedia.org/wiki/Kernel_(image_processing))
+
+---
+
+## Emboss
+- **Description**: Adds an emboss effect to the image.
+- **How it works**:
+  - Uses a 3x3 kernel to calculate new pixel values based on neighboring pixels.
+
+---
+
+## Rotate 90
+- **Description**: Rotates the image 90 degrees clockwise.
+- **Note**: Only supports square images currently.
+
+---
+
+## Rotate 180
+- **Description**: Rotates the image 180 degrees clockwise.
+
+---
+
+## Rotate 270
+- **Description**: Rotates the image 270 degrees clockwise.
+- **Note**: Only supports square images currently.
+
+---
+
+## Add Border
+- **Description**: Adds a solid-colored border to the image.
+- **How it works**:
+  - Takes `border_width` and a color as input from the user.
+  - Adds the specified border to the image.
+
+## Setup and Usage
+
+### Requirements
+To run the BMP Image Editing Tool, you need:
+- A **C compiler** (e.g., GCC).  
+  - For Windows, you can use MinGW to install GCC.  
+
+### Usage
+1. Open your terminal or command prompt.
+2. Navigate to the folder containing the source files.
+3. Compile the program with the following command:
+   - gcc -o main main.c filters.c
+4. Run the program:
+   - ./main
