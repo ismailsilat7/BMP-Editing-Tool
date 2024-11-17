@@ -245,7 +245,7 @@ void sharpen(int height, int width, RGBTRIPLE image[height][width]) {
     RGBTRIPLE sharpened[height][width];
     int kernel[3][3] = 
     {   {0, -1, 0}, 
-        {-1, 5, 0}, 
+        {-1, 5, -1}, 
         {0, -1, 0}
     };
     for (int i = 0; i < height; i++) {
