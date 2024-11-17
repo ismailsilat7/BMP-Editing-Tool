@@ -9,7 +9,7 @@ BMP Image Editing Tool for PF Project @ FAST NU Semester 1
    - [Supported BMP Type](#supported-bmp-type)  
 3. [File Structure](#file-structure) 
 4. [Function Descriptions](#function-descriptions)
-5. [Setup and Usage](#setup-and-compilation)
+5. [Setup and Usage](#setup-and-usage)
 6. [Collaborators](#collaborators)
   
 
@@ -104,7 +104,7 @@ We will be dealing with **standard 24-bit BMP files only**, for which the follow
 ### Note
 
 These checks ensure that the BMP file conforms to the standard 24-bit uncompressed format. Any deviation from these values will result in an "Unsupported file format" error.
-
+- [Learn more about how are 24-bit BMP Files stored](https://education.siggraph.org/static/HyperVis/asp_data/compimag/bmpfile.htm)
 
 # File Structure
 
