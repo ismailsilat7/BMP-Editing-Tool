@@ -7,7 +7,7 @@
 int main() {
     
     // taking input for read and write file
-    char * infile = "./images/courtyard.bmp";
+    char * infile = "./images/yard.bmp";
     char * outfile = "./images/outsample1.bmp";
 
     // opening readfile
@@ -74,8 +74,29 @@ int main() {
 
 
     // Call filters!!!! - manipulating pixelArray
-
-
+    // grayscale(height, width, pixelArray);
+    // sepia(height, width, pixelArray);
+    // reflect(height, width, pixelArray);
+    // blur(height, width, pixelArray);
+    // edges(height, width, pixelArray);
+    // adjust_brightness(height, width, pixelArray, -50);
+    // adjust_contrast(height, width, pixelArray, 0.5);
+    // invert_colors(height, width, pixelArray);
+    // pixelate(height, width, pixelArray, 10);
+    // vignette(height, width, pixelArray);
+    // sharpen(height, width, pixelArray);
+    // gaussian_blur(height, width,pixelArray);
+    // emboss(height, width, pixelArray);
+    // rotate_90(&infoheader.biHeight, &infoheader.biWidth, pixelArray); // must be square
+    // rotate_180(height, width, pixelArray);
+    // rotate_270(&infoheader.biHeight, &infoheader.biWidth, pixelArray); // must be square
+    /*
+    RGBTRIPLE border_colour;
+    border_colour.rgbtBlue = 0;
+    border_colour.rgbtGreen = 165;
+    border_colour.rgbtRed = 255;
+    add_border(height, width, pixelArray, 5, border_colour);
+    */
 
     // Writing outfile's headers
     fwrite(&fileheader, sizeof(BITMAPFILEHEADER), 1, writefile);
@@ -91,6 +112,7 @@ int main() {
 
     fclose(writefile);
     fclose(readfile);
+    free(pixelArray);
     return 0;
 }
 
