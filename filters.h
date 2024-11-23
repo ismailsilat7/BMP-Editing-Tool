@@ -40,13 +40,13 @@ void gaussian_blur(int height, int width, RGBTRIPLE image[height][width]);
 void emboss(int height, int width, RGBTRIPLE image[height][width]);
 
 //14. Rotate image by 90 degrees
-void rotate_90(int *height, int *width, RGBTRIPLE image[*height][*width]);
+void rotate_90(int *height, int *width, int *padding, RGBTRIPLE (**image)[*width]);
 
 //15. Rotate image by 180 degrees
 void rotate_180(int height, int width, RGBTRIPLE image[height][width]);
 
 //16. Rotate image by 270 degrees
-void rotate_270(int *height, int *width, RGBTRIPLE image[*height][*width]);
+void rotate_270(int *height, int *width, int *padding, RGBTRIPLE (**image)[*width]);
 
 //17. Add border to image
 void add_border(int height, int width, RGBTRIPLE image[height][width], int border_width, RGBTRIPLE border_color);

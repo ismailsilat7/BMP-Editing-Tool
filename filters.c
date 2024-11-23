@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 void grayscale(int height, int width, RGBTRIPLE image[height][width]) {
     
@@ -62,7 +63,11 @@ void reflect(int height, int width, RGBTRIPLE image[height][width]) {
 
 void blur(int height, int width, RGBTRIPLE image[height][width]) {
 
-    RGBTRIPLE blurred[height][width];
+    RGBTRIPLE (*blurred)[width] = malloc(height * sizeof(RGBTRIPLE[width]));
+    if (blurred == NULL) {
+        printf("Memory allocation failed for edged array!\n");
+        return;
+    }
     for (int i = 0; i < height; i++) {
 
         for (int j = 0; j < width; j++) {
@@ -94,7 +99,7 @@ void blur(int height, int width, RGBTRIPLE image[height][width]) {
             image[i][j] = blurred[i][j];
         }
     }
-
+    free(blurred);
     return;
 
 }
@@ -104,7 +109,11 @@ void edges(int height, int width, RGBTRIPLE image[height][width]) {
     int Gx[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
     int Gy[3][3] = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
     
-    RGBTRIPLE edged[height][width];
+    RGBTRIPLE (*edged)[width] = malloc(height * sizeof(RGBTRIPLE[width]));
+    if (edged == NULL) {
+        printf("Memory allocation failed for edged array!\n");
+        return;
+    }
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
@@ -141,7 +150,7 @@ void edges(int height, int width, RGBTRIPLE image[height][width]) {
             image[i][j] = edged[i][j];
         }
     }
-
+    free(edged);
     return;
 
 }
@@ -242,7 +251,11 @@ void vignette(int height, int width, RGBTRIPLE image[height][width]) {
 
 void sharpen(int height, int width, RGBTRIPLE image[height][width]) {
 
-    RGBTRIPLE sharpened[height][width];
+    RGBTRIPLE (*sharpened)[width] = malloc(height * sizeof(RGBTRIPLE[width]));
+    if (sharpened == NULL) {
+        printf("Memory allocation failed for edged array!\n");
+        return;
+    }
     int kernel[3][3] = 
     {   {0, -1, 0}, 
         {-1, 5, -1}, 
@@ -280,12 +293,16 @@ void sharpen(int height, int width, RGBTRIPLE image[height][width]) {
             image[i][j] = sharpened[i][j];
         }
     }
-
+    free(sharpened);
 }
 
 void gaussian_blur(int height, int width, RGBTRIPLE image[height][width]) {
 
-    RGBTRIPLE blurred[height][width];
+    RGBTRIPLE (*blurred)[width] = malloc(height * sizeof(RGBTRIPLE[width]));
+    if (blurred == NULL) {
+        printf("Memory allocation failed for edged array!\n");
+        return;
+    }
     float kernel[5][5] = {
         {1.0 / 256, 4.0 / 256, 6.0 / 256, 4.0 / 256, 1.0 / 256},
         {4.0 / 256, 16.0 / 256, 24.0 / 256, 16.0 / 256, 4.0 / 256},
@@ -324,12 +341,16 @@ void gaussian_blur(int height, int width, RGBTRIPLE image[height][width]) {
             image[i][j] = blurred[i][j];
         }
     }
-
+    free(blurred);
 }
 
 void emboss(int height, int width, RGBTRIPLE image[height][width]) {
     
-    RGBTRIPLE embossed[height][width];
+    RGBTRIPLE (*embossed)[width] = malloc(height * sizeof(RGBTRIPLE[width]));
+    if (embossed == NULL) {
+        printf("Memory allocation failed for edged array!\n");
+        return;
+    }
     int kernel[3][3] = {
         {-2, -1,  0},
         {-1,  1,  1},
@@ -366,38 +387,44 @@ void emboss(int height, int width, RGBTRIPLE image[height][width]) {
             image[i][j] = embossed[i][j];
         }
     }
+    free(embossed);
+    return;
 }
 
-void rotate_90(int *height, int *width, RGBTRIPLE image[*height][*width]) {
+void rotate_90(int *height, int *width, int *padding, RGBTRIPLE (**image)[*width]) {
+    if (*height == 0 || *width == 0 || *image == NULL) {
+        printf("Invalid input: height = %d, width = %d, image pointer is %s.\n",
+               *height, *width, *image == NULL ? "NULL" : "valid");
+        return;
+    }
+    printf("Old: width=%d, height=%d, padding=%d\n", *width, *height, *padding);
 
-    if (*height != *width) {
+    int newHeight = *width;
+    int newWidth = abs(*height);
+
+    int newPadding = (4 - (newWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+
+    RGBTRIPLE (*temp)[newWidth] = malloc(newHeight * newWidth * sizeof(RGBTRIPLE));
+    if (temp == NULL) {
+        printf("Memory allocation failed!\n");
         return;
     }
 
-    RGBTRIPLE temp[*height][*width];
-
-    for (int i = 0; i < *height; i++) {
+    // Rotate
+    for (int i = 0; i < abs(*height); i++) {
         for (int j = 0; j < *width; j++) {
-            temp[j][*height - 1 - i] = image[i][j];
+            temp[j][newWidth - 1 - i] = (*image)[i][j];
         }
     }
 
-    int swap = *height;
-    *height = *width;
-    *width = swap;
+    free(*image);
 
-    // Change dimensions for image array
-    // image[*height][*width] to image[*width][*height]
+    *image = (RGBTRIPLE (*)[newWidth])temp;
 
-
-    // copy stuff back to the image array with updated dimensions
-    for (int i = 0; i < *height; i++) {
-        for (int j = 0; j < *width; j++) {
-            image[i][j] = temp[i][j];
-        }
-    }
-
-    return;
+    *height = (*height < 0)? -newHeight : newHeight;
+    *width = newWidth;
+    *padding = newPadding;
+    printf("New: width=%d, height=%d, padding=%d\n", *width, *height, *padding);
 }
 
 void rotate_180(int height, int width, RGBTRIPLE image[height][width]) {
@@ -412,35 +439,39 @@ void rotate_180(int height, int width, RGBTRIPLE image[height][width]) {
     return;
 }
 
-void rotate_270(int *height, int *width, RGBTRIPLE image[*height][*width]) {
-    if (*height != *width) {
+void rotate_270(int *height, int *width, int *padding, RGBTRIPLE (**image)[*width]) {
+    if (*height == 0 || *width == 0 || *image == NULL) {
+        printf("Invalid input: height = %d, width = %d, image pointer is %s.\n",
+               *height, *width, *image == NULL ? "NULL" : "valid");
         return;
     }
 
-    RGBTRIPLE temp[*height][*width];
+    int newHeight = *width;
+    int newWidth = abs(*height);
 
-    for (int i = 0; i < *height; i++) {
+    int newPadding = (4 - (newWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+
+    RGBTRIPLE (*temp)[newWidth] = malloc(newHeight * newWidth * sizeof(RGBTRIPLE));
+    if (temp == NULL) {
+        printf("Memory allocation failed!\n");
+        return;
+    }
+
+    // Rotate
+    for (int i = 0; i < abs(*height); i++) {
         for (int j = 0; j < *width; j++) {
-            temp[*width - 1 -j][i] = image[i][j];
+            temp[newHeight - 1 -j][i] = (*image)[i][j];
         }
     }
 
-    int swap = *height;
-    *height = *width;
-    *width = swap;
+    free(*image);
 
-    // Change dimensions for image array
-    // image[*height][*width] to image[*width][*height]
+    *image = (RGBTRIPLE (*)[newWidth])temp;
 
+    *height = -newHeight;
+    *width = newWidth;
+    *padding = newPadding;
 
-    // copy stuff back to the image array with updated dimensions
-    for (int i = 0; i < *height; i++) {
-        for (int j = 0; j < *width; j++) {
-            image[i][j] = temp[i][j];
-        }
-    }
-
-    return;
 }
 
 void add_border(int height, int width, RGBTRIPLE image[height][width], int border_width, RGBTRIPLE border_color) {
