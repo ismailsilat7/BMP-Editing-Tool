@@ -1,14 +1,37 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 #include "filters.h"
 
 int main() {
     
+    printf(" ____  __  __ ____    ___                             \n");
+    printf("| __ )|  \\/  |  _ \\  |_ _|_ __ ___   __ _  __ _  ___ \n");
+    printf("|  _ \\| |\\/| | |_) |  | || '_ ` _ \\ / _` |/ _` |/ _ \\\n");
+    printf("| |_) | |  | |  __/   | || | | | | | (_| | (_| |  __/\n");
+    printf("|____/|_| _|_|_|     |___|_| |_| |_|\\__,_|\\__, |\\___|\n");
+    printf("                                          |___/      \n");
+    printf("\n");
+    printf(" _____    _ _ _   _               _____           _  \n");
+    printf("| ____|__| (_) |_(_)_ __   __ _  |_   _|__   ___ | | \n");
+    printf("|  _| / _` | | __| | '_ \\ / _` |   | |/ _ \\ / _ \\| | \n");
+    printf("| |__| (_| | | |_| | | | | (_| |   | | (_) | (_) | | \n");
+    printf("|_____\\__,_|_|\\__|_|_| |_|\\__, |   |_|\\___/ \\___/|_| \n");
+    printf("                          |___/                      \n");
+
+
     // taking input for read and write file
-    char * infile = "./images/yard.bmp";
-    char * outfile = "./images/outsample1.bmp";
+    char infile[100] = "./images/100x100_image.bmp";
+    char outfile[100] = "./images/outsample1.bmp";
+
+    printf("Valid filename format: './images/<image_name>.bmp\n");
+    printf("Enter filename to edit: ");
+    fgets(infile, 100, stdin);
+    infile[strcspn(infile, "\n")] = '\0';
+    printf("Enter output filename: ");
+    fgets(outfile, 100, stdin);
+    outfile[strcspn(outfile, "\n")] = '\0';
 
     // opening readfile
     FILE *readfile = fopen(infile, "rb");
@@ -73,30 +96,147 @@ int main() {
     }
 
 
-    // Call filters!!!! - manipulating pixelArray
-    // grayscale(height, width, pixelArray);
-    // sepia(height, width, pixelArray);
-    // reflect(height, width, pixelArray);
-    // blur(height, width, pixelArray);
-    // edges(height, width, pixelArray);
-    // adjust_brightness(height, width, pixelArray, -50);
-    // adjust_contrast(height, width, pixelArray, 0.5);
-    // invert_colors(height, width, pixelArray);
-    // pixelate(height, width, pixelArray, 10);
-    // vignette(height, width, pixelArray);
-    // sharpen(height, width, pixelArray);
-    // gaussian_blur(height, width,pixelArray);
-    // emboss(height, width, pixelArray);
-    // rotate_90(&infoheader.biHeight, &infoheader.biWidth, pixelArray); // must be square
-    // rotate_180(height, width, pixelArray);
-    // rotate_270(&infoheader.biHeight, &infoheader.biWidth, pixelArray); // must be square
-    /*
+    // Calling filters after user input!!!! - manipulating pixelArray
+
+    printf("Select a filter to apply:\n");
+    printf("1. Grayscale\n");
+    printf("2. Sepia\n");
+    printf("3. Reflect\n");
+    printf("4. Blur\n");
+    printf("5. Edges\n");
+    printf("6. Adjust Brightness\n");
+    printf("7. Adjust Contrast\n");
+    printf("8. Invert Colors\n");
+    printf("9. Pixelate\n");
+    printf("10. Vignette\n");
+    printf("11. Sharpen\n");
+    printf("12. Gaussian Blur\n");
+    printf("13. Emboss\n");
+    printf("14. Rotate 90\n");
+    printf("15. Rotate 180\n");
+    printf("16. Rotate 270\n");
+    printf("17. Add Border\n");
+    int choice;
+    do {
+        printf("Enter your choice (1-17): ");
+        scanf("%d", &choice);
+        getchar();
+        if (choice < 0 || choice > 17) {
+            printf("Invalid choice, try again.\n");
+        }
+    } while(choice < 0 || choice > 17);
+
+    // Declarations for user input
+    int brightness;
+    float contrast;
+    int block_size;
+    int max;
     RGBTRIPLE border_colour;
-    border_colour.rgbtBlue = 0;
-    border_colour.rgbtGreen = 165;
-    border_colour.rgbtRed = 255;
-    add_border(height, width, pixelArray, 5, border_colour);
-    */
+    switch(choice) {
+        case 1:
+            grayscale(height, width, pixelArray);
+            break;
+        case 2:
+            sepia(height, width, pixelArray);
+            break;
+        case 3:
+            reflect(height, width, pixelArray);
+            break;
+        case 4:
+            blur(height, width, pixelArray);
+            break;
+        case 5:
+            edges(height, width, pixelArray);
+            break;
+        case 6:
+            do {
+                printf("Enter brightness value to be added (-255 to 255 inclusive): ");
+                scanf("%d", &brightness);
+                if (brightness < -255 || brightness > 255) {
+                    printf("Value out of range\n");
+                }
+            } while(brightness < -255 || brightness > 255);
+            adjust_brightness(height, width, pixelArray, brightness);
+            break;
+        case 7:
+            do {
+                printf("Enter contrast factor value to be added (0.0 to 2.0 inclusive): ");
+                scanf("%f", &contrast);
+                if (contrast < 0.0 || contrast > 2.0) {
+                    printf("Value out of range\n");
+                }
+            } while(contrast < -0.0 || contrast > 2.0);
+            adjust_contrast(height, width, pixelArray, contrast);
+            break;
+        case 8:
+            invert_colors(height, width, pixelArray);
+            break;
+        case 9:
+            max = (height > width) ? width : height;
+            do {
+                printf("Enter pixelate value for square block_size (0 to %d): ", max);
+                scanf("%d", &block_size);
+                if (block_size < 0 || block_size > max) {
+                    printf("Value out of range\n");
+                }
+            } while(block_size < 0 || block_size > max);
+            pixelate(height, width, pixelArray, 10);
+            break;
+        case 10:
+            vignette(height, width, pixelArray);
+            break;
+        case 11:
+            sharpen(height, width, pixelArray);
+            break;
+        case 12:
+            gaussian_blur(height, width, pixelArray);
+            break;
+        case 13:
+            emboss(height, width, pixelArray);
+            break;
+        case 14:
+            rotate_90(&infoheader.biHeight, &infoheader.biWidth, &padding, &pixelArray);
+            break;
+        case 15:
+            rotate_180(height, width, pixelArray);
+            break;
+        case 16:
+            rotate_270(&infoheader.biHeight, &infoheader.biWidth, &padding, &pixelArray);
+            break;
+        case 17:
+            printf("A Pixel Color consists of Red Green & Blue values\n");
+            do {
+                printf("Enter Red color value for border_color (0 to 255 inclusive): ");
+                scanf("%d", &border_colour.rgbtRed);
+                if (border_colour.rgbtRed < 0 || border_colour.rgbtRed > 255) {
+                    printf("Value out of range\n");
+                }
+            } while(border_colour.rgbtRed < 0 || border_colour.rgbtRed > 255);
+
+            do {
+                printf("Enter Green color value for border_color (0 to 255 inclusive): ");
+                scanf("%d", &border_colour.rgbtGreen);
+                if (border_colour.rgbtGreen < 0 || border_colour.rgbtGreen > 255) {
+                    printf("Value out of range\n");
+                }
+            } while(border_colour.rgbtGreen < 0 || border_colour.rgbtGreen > 255);
+            
+            do {
+                printf("Enter Blue color value for border_color (0 to 255 inclusive): ");
+                scanf("%d", &border_colour.rgbtBlue);
+                if (border_colour.rgbtBlue < 0 || border_colour.rgbtBlue > 255) {
+                    printf("Value out of range\n");
+                }
+            } while(border_colour.rgbtBlue < 0 || border_colour.rgbtBlue > 255);
+
+            add_border(height, width, pixelArray, 5, border_colour);
+            break;
+    }
+
+    if (choice == 14 || choice == 16) {
+        infoheader.biSizeImage = ((infoheader.biWidth * sizeof(RGBTRIPLE)) + padding) * infoheader.biHeight;
+        fileheader.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + infoheader.biSizeImage;
+    }
 
     // Writing outfile's headers
     fwrite(&fileheader, sizeof(BITMAPFILEHEADER), 1, writefile);
@@ -109,6 +249,8 @@ int main() {
         // writing padding at the end of row
         fwrite(&paddingValue, sizeof(BYTE), padding, writefile);
     }
+
+    printf("%s edited and saved as %s successfully\n", infile, outfile);
 
     fclose(writefile);
     fclose(readfile);
